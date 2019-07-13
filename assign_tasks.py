@@ -70,7 +70,7 @@ def find_assignees(data):
            task_to_tasker[task_id] = tasker_id
 
     for task in tasks:
-       task['assignee_id'] = task_to_tasker[task['id']]
+        task['assignee_id'] = task_to_tasker.get(task['id'], None)  # None means the task is not assigned
 
     return data
 
