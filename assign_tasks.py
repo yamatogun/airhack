@@ -3,7 +3,7 @@ import json
 from math import acos, cos, sin
 import math
 
-data = '{ "batchId": "1562940000_50_5", "taskersCount": 5, "tasksCount": 50, "tasks": [{ "dueTime": "16:30", "lat": 48.85554319120794, "lng": 2.3613359633447204, "assignee_id": null, "id": 6480 }, { "dueTime": "13:15", "lat": 48.85313729018271, "lng": 2.32256080014798, "assignee_id": null, "id": 9297 }, { "dueTime": "21:45", "lat": 48.838453425693785, "lng": 2.372673134911582, "assignee_id": null, "id": 1889 } ] }'
+#data = '{ "batchId": "1562940000_50_5", "taskersCount": 5, "tasksCount": 50, "tasks": [{ "dueTime": "16:30", "lat": 48.85554319120794, "lng": 2.3613359633447204, "assignee_id": null, "id": 6480 }, { "dueTime": "13:15", "lat": 48.85313729018271, "lng": 2.32256080014798, "assignee_id": null, "id": 9297 }, { "dueTime": "21:45", "lat": 48.838453425693785, "lng": 2.372673134911582, "assignee_id": null, "id": 1889 } ] }'
 
 TASKER_SPEED = 10  # km/h
 EARTH_RADIUS = 6378  # km
@@ -24,7 +24,7 @@ def get_distance(task_a, task_b):
     return EARTH_RADIUS * acos(sin(lat_a) * sin(lat_b) + cos(lat_a) * cos(lat_b) * cos(lgn_a - lgn_b))
 
 
-def assign_tasks(data):
+def find_assignees(data):
     data = json.loads(data)
     ntaskers = data['taskersCount']
 
@@ -37,7 +37,6 @@ def assign_tasks(data):
 
     for i in range(ntaskers):  # O(M)
         tasker_id = i + 1
-        print('tasker_id', tasker_id)
         tasker_to_tasks.setdefault(tasker_id, [])
         # select task due time whose duetime is the earliest
         for task in sorted_tasks:
@@ -59,11 +58,6 @@ def assign_tasks(data):
             travel_time = get_distance(current_task, task) / TASKER_SPEED
             endtime = get_datetime(current_task['dueTime']) + timedelta(minutes=30)
             task_mintime_arrival = endtime + timedelta(hours=travel_time)  # possible to use decimal hours
-            #print('task')
-            #print(task)
-            #print(endtime)
-            #print(task_mintime_arrival)
-            #task_schedule.append((task_id, task_duetime, task_mintime_arrival))
 
             if task_mintime_arrival <= task_duetime:  # select as next task
                 tasker_to_tasks[tasker_id].append(task_id)
@@ -80,4 +74,5 @@ def assign_tasks(data):
 
     return data
 
-print(assign_tasks(data))
+if __name__ == '__main__':
+    print(assign_tasks(data))
